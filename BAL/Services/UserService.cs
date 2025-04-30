@@ -58,7 +58,7 @@ internal class UserService : IUserService
         }
 
         if (user.Amount <= 0)
-            return new UserResponseDTO 
+            return new UserResponseDTO
             {
                 Message = "Amount must be greater than zero.",
                 Data = null
@@ -67,7 +67,7 @@ internal class UserService : IUserService
         if (user.Amount > item.Wallet)
             return new UserResponseDTO
             {
-                Message = "Insufficient funds.",    
+                Message = "Insufficient funds.",
                 Data = null
             };
 
@@ -169,6 +169,29 @@ internal class UserService : IUserService
             }
 
             return transactions.ToList();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task<UserIncomeOutcomeDTO> GetIncomeOutcomebyUserId(Guid userId)
+    {
+        try
+        {
+            var transactions = await _unitOfWork.Transaction.GetByCondition(x => x.UserID == userId);
+            if (transactions == null || !transactions.Any())
+            {
+                throw new Exception("No transactions found for this user.");
+            }
+            var income = transactions.Where(t => t.TransactionType == "Deposit").Sum(t => t.Amount);
+            var outcome = transactions.Where(t => t.TransactionType == "Withdraw").Sum(t => t.Amount);
+            return
+                new UserIncomeOutcomeDTO
+                {
+                    Income = income,
+                    Outcome = outcome
+                };
         }
         catch (Exception)
         {

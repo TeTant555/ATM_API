@@ -16,5 +16,6 @@ public interface IUserService
     Task<UserResponseDTO> Deposit(UserRequestDTO userRequest);
     Task<decimal?> CheckBalance(Guid  userId);
     Task<List<Transaction>> GetTransactionByUserId(Guid userId);
+    Task<UserIncomeOutcomeDTO> GetIncomeOutcomebyUserId(Guid userId);
 
 }

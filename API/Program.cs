@@ -15,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var appSettings = new AppSettings();
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 builder.Configuration.GetSection("AppSettings").Bind(appSettings);
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 ServiceManager.SetServiceInfo(builder.Services, appSettings);
@@ -107,7 +109,21 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetSection("AppSettings:ConnectionStrings:DefaultConnection").Value));
 
+builder.Services.AddCors(options => 
+{
+    options.AddPolicy(name: "AllowFrontend",
+    policy =>
+    {
+    policy.WithOrigins("http://localhost:5173") // your frontend URL
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 //if (app.Environment.IsDevelopment())
 //{

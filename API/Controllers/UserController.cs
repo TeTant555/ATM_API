@@ -8,7 +8,6 @@ using REPOSITORY.UnitOfWork;
 namespace API.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -20,7 +19,6 @@ namespace API.Controllers
             _userService = userService;
         }
 
-        // [Authorize]
         [HttpGet("GetAllUser")]
         public async Task<IActionResult> GetAllUser()
         {
@@ -34,6 +32,8 @@ namespace API.Controllers
                 return BadRequest(new ResponseModel { Message = ex.Message, Status = APIStatus.SystemError });
             }
         }
+
+        [Authorize]
         [HttpPatch("Withdraw")]
         public async Task<IActionResult> Withdraw(UserRequestDTO user)
         {
@@ -47,6 +47,8 @@ namespace API.Controllers
                 return BadRequest(new ResponseModel { Message = ex.Message, Status = APIStatus.SystemError });
             }
         }
+
+        [Authorize]
         [HttpPatch("Deposit")]
         public async Task<IActionResult> Deposit(UserRequestDTO user)
         {
@@ -87,12 +89,27 @@ namespace API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetTransactionByUserId")]
         public async Task<IActionResult> GetTransactionByUserId(Guid userId)
         {
             try
             {
                 var result = await _userService.GetTransactionByUserId(userId);
+                return Ok(new ResponseModel { Message = Messages.Result, Status = APIStatus.Successful, Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModel { Message = ex.Message, Status = APIStatus.SystemError });
+            }
+        }
+        [Authorize]
+        [HttpGet("GetIncomeOutcomebyUserId")]
+        public async Task<IActionResult> GetIncomeOutcomebyUserId(Guid userId)
+        {
+            try
+            {
+                var result = await _userService.GetIncomeOutcomebyUserId(userId);
                 return Ok(new ResponseModel { Message = Messages.Result, Status = APIStatus.Successful, Data = result });
             }
             catch (Exception ex)
